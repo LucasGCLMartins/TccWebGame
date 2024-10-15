@@ -44,6 +44,82 @@ medicoEsquerda.src='./img/medicoEsquerda4.png'
 const medicoDireita = new Image()
 medicoDireita.src='./img/medicoDireita4.png'
 
+const npc1Image = new Image()
+npc1Image.src = './img/npc1.png'
+
+const npc2Image = new Image()
+npc2Image.src = './img/npc2.png'
+
+const npc3Image = new Image()
+npc3Image.src = './img/npc3.png'
+
+const npc4Image = new Image()
+npc4Image.src = './img/npc4.png'
+
+let dialogoAtivo = false
+let npcAtual = null
+const dialogos = {
+    npc1: ["NPC 1 Dialogo 1", "NPC 1 Dialogo 2"],
+    npc2: ["NPC 2 Dialogo 1", "NPC 2 Dialogo 2"],
+    npc3: ["NPC 3 Dialogo 1", "NPC 3 Dialogo 2"],
+    npc4: ["NPC 4 Dialogo 1", "NPC 4 Dialogo 2"]
+}
+
+function verificarProximidade(player, npc) {
+    const distancia = Math.hypot(
+        player.position.x - npc.position.x,
+        player.position.y - npc.position.y
+    );
+    return distancia < 150;
+}
+
+
+function iniciarDialogo(npc) {
+    dialogoAtivo = true;
+    npcAtual = npc;
+}
+
+function ocultarCaixaDeDialogo() {
+    dialogoAtivo = false;
+    npcAtual = null; 
+}
+
+function desenharDialogo(npc, dialogo) {
+    const padding = 10;
+    const maxWidth = 300; 
+    const fontSize = 18;
+    
+    const dialogoX = npc.position.x + npc.width + 10; 
+    const dialogoY = npc.position.y - npc.height / 2; 
+
+    c.fillStyle = 'black'; 
+    c.fillRect(dialogoX, dialogoY, maxWidth, 100);
+
+    c.font = `${fontSize}px Arial`;
+    c.fillStyle = 'white';
+
+    const palavras = dialogo.split(' ');
+    let linha = '';
+    let linhaY = dialogoY + padding + fontSize; 
+
+    palavras.forEach((palavra) => {
+        const testeLinha = linha + palavra + ' ';
+        const larguraTeste = c.measureText(testeLinha).width;
+
+        if (larguraTeste > maxWidth - padding * 2) {
+            c.fillText(linha, dialogoX + padding, linhaY);
+            linha = palavra + ' ';
+            linhaY += fontSize; 
+        } else {
+            linha = testeLinha;
+        }
+    });
+
+    c.fillText(linha, dialogoX + padding, linhaY);
+}
+
+
+
 const player = new Sprite ({
     position:{
         x:canvas.width/2 - 576 /6 / 2,
@@ -68,6 +144,44 @@ const hospital = new Sprite({
     },
     image: image
 })
+
+const npc1 = new Sprite({
+    position: {
+        x: 300, 
+        y: -300
+    },
+    image: npc1Image,
+    frames: { max: 6 }
+})
+
+const npc2 = new Sprite({
+    position: {
+        x: 300, 
+        y: -750
+    },
+    image: npc2Image,
+    frames: { max: 6 }
+})
+
+const npc3 = new Sprite({
+    position: {
+        x: 1500, 
+        y: -300
+    },
+    image: npc3Image,
+    frames: { max: 6 }
+})
+
+const npc4 = new Sprite({
+    position: {
+        x: 1500, 
+        y: -750
+    },
+    image: npc4Image,
+    frames: { max: 6 }
+})
+
+
 
 const keys = {
     w:{ 
@@ -94,7 +208,11 @@ const keys = {
 
 const movable = [
     hospital,
-    ...limites
+    ...limites,
+    npc1,
+    npc2,
+    npc3,
+    npc4
     //testBound
 ]
 
@@ -113,14 +231,43 @@ function animate (){
     hospital.draw()
     limites.forEach(limite =>{
         limite.draw()
-
     })
+
     //testBound.draw()
+    npc1.draw()
+    npc2.draw()
+    npc3.draw()
+    npc4.draw()
     player.draw()
 
     let moving = true
 
     player.moving=false
+
+    npc1.moving=true
+    npc2.moving=true
+    npc3.moving=true
+    npc4.moving=true
+
+    if (!dialogoAtivo) {
+
+        if (verificarProximidade(player, npc1)) iniciarDialogo('npc1');
+        else if (verificarProximidade(player, npc2)) iniciarDialogo('npc2');
+        else if (verificarProximidade(player, npc3)) iniciarDialogo('npc3');
+        else if (verificarProximidade(player, npc4)) iniciarDialogo('npc4');
+    } else {
+        const npcObjeto = eval(npcAtual) 
+        if (!verificarProximidade(player, npcObjeto)) {
+            ocultarCaixaDeDialogo() 
+        }
+    }
+
+
+    if (dialogoAtivo && npcAtual) {
+        desenharDialogo(eval(npcAtual), dialogos[npcAtual][0]); 
+    }
+
+
     if(keys.w.pressed){
         player.moving=true
         player.image= player.sprites.up
