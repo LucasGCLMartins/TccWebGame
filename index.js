@@ -58,12 +58,46 @@ npc4Image.src = './img/npc4.png'
 
 let dialogoAtivo = false
 let npcAtual = null
+let opcaoSelecionada = null
+
+
 const dialogos = {
-    npc1: ["NPC 1 Dialogo 1", "NPC 1 Dialogo 2"],
-    npc2: ["NPC 2 Dialogo 1", "NPC 2 Dialogo 2"],
-    npc3: ["NPC 3 Dialogo 1", "NPC 3 Dialogo 2"],
-    npc4: ["NPC 4 Dialogo 1", "NPC 4 Dialogo 2"]
+    npc1: {
+        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
+        respostas: ["Oi padrão npc 1","Resposta NPC 1 para Pergunta 1", "Resposta NPC 1 para Pergunta 2", "Resposta NPC 1 para Pergunta 3"]
+    },
+    npc2: {
+        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
+        respostas: ["Oi padrão npc 2","Resposta NPC 2 para Pergunta 1", "Resposta NPC 2 para Pergunta 2", "Resposta NPC 2 para Pergunta 3"]
+    },
+    npc3: {
+        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
+        respostas: ["Oi padrão npc 3","Resposta NPC 3 para Pergunta 1", "Resposta NPC 3 para Pergunta 2", "Resposta NPC 3 para Pergunta 3"]
+    },
+    npc4: {
+        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
+        respostas: ["Oi padrão npc 4","Resposta NPC 4 para Pergunta 1", "Resposta NPC 4 para Pergunta 2", "Resposta NPC 4 para Pergunta 3"]
+    }
 }
+
+function desenharOpcoesDeDialogo(npc) {
+    const padding = 10
+    const maxWidth = 300
+    const fontSize = 18
+    const opcoes = dialogos[npc].opcoes
+    const dialogoX = 50
+    const dialogoY = 450
+
+    c.fillStyle = 'black'
+    c.fillRect(dialogoX, dialogoY, maxWidth, 100 + (fontSize + padding) * opcoes.length)
+
+    c.font = `${fontSize}px Arial`
+    c.fillStyle = 'white'
+    opcoes.forEach((opcao, index) => {
+        c.fillText(`${index + 1}. ${opcao}`, dialogoX + padding, dialogoY + padding + (index * (fontSize + padding)))
+    })
+}
+
 
 function verificarProximidade(player, npc) {
     const distancia = Math.hypot(
@@ -77,6 +111,7 @@ function verificarProximidade(player, npc) {
 function iniciarDialogo(npc) {
     dialogoAtivo = true;
     npcAtual = npc;
+    desenharOpcoesDeDialogo(npc)
 }
 
 function ocultarCaixaDeDialogo() {
@@ -89,7 +124,7 @@ function desenharDialogo(npc, dialogo) {
     const maxWidth = 300; 
     const fontSize = 18;
     
-    const dialogoX = npc.position.x + npc.width + 10; 
+    const dialogoX =  npc.position.x + npc.width + 10; 
     const dialogoY = npc.position.y - npc.height / 2; 
 
     c.fillStyle = 'black'; 
@@ -198,14 +233,6 @@ const keys = {
     }   
 }
 
-//const testBound = new Limite({
-//    position:{
-//        x:400,
-//        y:400
-//    }
-//})
-
-
 const movable = [
     hospital,
     ...limites,
@@ -233,7 +260,6 @@ function animate (){
         limite.draw()
     })
 
-    //testBound.draw()
     npc1.draw()
     npc2.draw()
     npc3.draw()
@@ -256,106 +282,95 @@ function animate (){
         else if (verificarProximidade(player, npc3)) iniciarDialogo('npc3');
         else if (verificarProximidade(player, npc4)) iniciarDialogo('npc4');
     } else {
+
+        desenharOpcoesDeDialogo(npcAtual);
+
+        switch(opcaoSelecionada){
+            case "1":
+                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[1]); 
+            break
+            case "2":
+                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[2]); 
+            break
+            case "3":
+                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[3]); 
+            break
+            default:
+                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[0]); 
+            break;
+
+        }
+
         const npcObjeto = eval(npcAtual) 
         if (!verificarProximidade(player, npcObjeto)) {
             ocultarCaixaDeDialogo() 
+            opcaoSelecionada = null
         }
+        
     }
 
 
-    if (dialogoAtivo && npcAtual) {
-        desenharDialogo(eval(npcAtual), dialogos[npcAtual][0]); 
-    }
-
-
-    if(keys.w.pressed){
-        player.moving=true
-        player.image= player.sprites.up
-        for(let i = 0; i< limites.length;i++){
-            const limite = limites[i]
-            if(
-                objColisao({
-                    rect1:player,
-                    rect2:{...limite, position:{
-                        x:limite.position.x,
-                        y:limite.position.y + 6
-                    }}
-                })
-            ){
-                moving = false
-                break
+    if (keys.w.pressed) {
+        player.moving = true;
+        player.image = player.sprites.up;
+        for (let i = 0; i < limites.length; i++) {
+            const limite = limites[i];
+            if (objColisao({ rect1: player, rect2: { ...limite, position: { x: limite.position.x, y: limite.position.y + 3 } } })) {
+                moving = false;
+                break;
             }
         }
-        if(moving){
-            movable.forEach(movable => {movable.position.y +=6})}
-    }
-    if(keys.a.pressed){
-        player.moving=true
-        player.image= player.sprites.left
-        for(let i = 0; i< limites.length;i++){
-            const limite = limites[i]
-            if(
-                objColisao({
-                    rect1:player,
-                    rect2:{...limite, position:{
-                        x:limite.position.x +6,
-                        y:limite.position.y 
-                    }}
-                })
-            ){
-                moving = false
-                break
+        if (moving) movable.forEach(movable => movable.position.y += 3);
+    } else if (keys.a.pressed) {
+        player.moving = true;
+        player.image = player.sprites.left;
+        for (let i = 0; i < limites.length; i++) {
+            const limite = limites[i];
+            if (objColisao({ rect1: player, rect2: { ...limite, position: { x: limite.position.x + 3, y: limite.position.y } } })) {
+                moving = false;
+                break;
             }
         }
-        if(moving){
-        movable.forEach(movable => {movable.position.x +=6})}
-    }
-    if(keys.s.pressed){
-        player.image= player.sprites.down
-        player.moving=true
-        for(let i = 0; i< limites.length;i++){
-            const limite = limites[i]
-            if(
-                objColisao({
-                    rect1:player,
-                    rect2:{...limite, position:{
-                        x:limite.position.x,
-                        y:limite.position.y - 6
-                    }}
-                })
-            ){
-                moving = false
-                break
+        if (moving) movable.forEach(movable => movable.position.x += 3);
+    } else if (keys.s.pressed) {
+        player.moving = true;
+        player.image = player.sprites.down;
+        for (let i = 0; i < limites.length; i++) {
+            const limite = limites[i];
+            if (objColisao({ rect1: player, rect2: { ...limite, position: { x: limite.position.x, y: limite.position.y - 3 } } })) {
+                moving = false;
+                break;
             }
         }
-        if(moving){
-        movable.forEach(movable => {movable.position.y -=6})}
-    }
-    if(keys.d.pressed){
-        player.moving=true
-        player.image= player.sprites.right
-        for(let i = 0; i< limites.length;i++){
-            const limite = limites[i]
-            if(
-                objColisao({
-                    rect1:player,
-                    rect2:{...limite, position:{
-                        x:limite.position.x - 6,
-                        y:limite.position.y 
-                    }}
-                })
-            ){
-                moving = false
-                break
+        if (moving) movable.forEach(movable => movable.position.y -= 3);
+    } else if (keys.d.pressed) {
+        player.moving = true;
+        player.image = player.sprites.right;
+        for (let i = 0; i < limites.length; i++) {
+            const limite = limites[i];
+            if (objColisao({ rect1: player, rect2: { ...limite, position: { x: limite.position.x - 3, y: limite.position.y } } })) {
+                moving = false;
+                break;
             }
         }
-        if(moving){
-        movable.forEach(movable => {movable.position.x -=6})}
+        if (moving) movable.forEach(movable => movable.position.x -= 3);
     }
 
 }
 
 animate()
+
+window.addEventListener('keydown', (e) => {
+    if (dialogoAtivo) {
+        if (e.key === '1') {
+            opcaoSelecionada = "1";
+        } else if (e.key === '2') {
+            opcaoSelecionada = "2";
+        } else if (e.key === '3') {
+            opcaoSelecionada = "3";
+        }
+    }
+})
 
 window.addEventListener('keydown', (e) => {
     switch(e.key){
