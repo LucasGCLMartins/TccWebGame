@@ -64,7 +64,7 @@ let controla_alerta = false
 
 
 const dialogos = {
-    npc1: {
+    npc3: {
         opcoes: [
             "Essas dificuldades acontecem apenas no trabalho ou em outros lugares também?", 
             "Você diria que tem dificuldade para entender as formas dos objetos?", 
@@ -77,56 +77,70 @@ const dialogos = {
     },
     npc2: {
         opcoes: [
-            "Pergunta 1", 
-            "Pergunta 2", 
-            "Pergunta 3"],
+            "Você consegue reconhecer as pessoas pela voz ou pelo jeito que elas andam?", 
+            "Você tem dificuldade em lembrar dos detalhes dos rostos das pessoas?", 
+            "Você consegue identificar outras coisas, como objetos ou lugares?"],
         respostas: [
-            "Oi padrão npc 2",
-            "Resposta NPC 2 para Pergunta 1", 
-            "Resposta NPC 2 para Pergunta 2", 
-            "Resposta NPC 2 para Pergunta 3"]
+            "É tão estranho, doutor. Eu olho para as pessoas que conheço, mas os rostos delas parecem borrões. Nem meus filhos eu reconheço mais.",
+            "Sim, a voz ajuda, assim como o jeito que andam, mas principalmente suas roupas.", 
+            "Exatamente. Os rostos parecem todos iguais. É como se tudo nele estivesse rabiscado.", 
+            "Ah, sim. Com objetos e lugares, eu ainda não tenho problema, só com os rostos mesmo"]
     },
-    npc3: {
-        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
-        respostas: ["Oi padrão npc 3","Resposta NPC 3 para Pergunta 1", "Resposta NPC 3 para Pergunta 2", "Resposta NPC 3 para Pergunta 3"]
+    npc1: {
+        opcoes: [
+            "Você tem dificuldade em encontrar o caminho de volta para casa?", 
+            "Você consegue se lembrar do nome dos lugares que visita?", 
+            "Quando anda pela cidade, sente que está em um lugar desconhecido?"],
+        respostas: [
+            "Doutor, algo estranho está acontecendo comigo. Eu sempre conheci cada rua dessa cidade, mas recentemente, mesmo no bairro de casa, me perco constantemente.",
+            "Sim, doutor. Às vezes, mesmo estando a poucos metros de casa, eu fico confuso de onde ir", 
+            "Ah, sim, meu problema é que enquanto estou andando, eu me esqueço de onde estou, parece que as ruas se misturam", 
+            "Isso mesmo! Lugares que conheço bem às vezes parecem diferentes, como se eu estivesse em outra cidade."]
     },
     npc4: {
-        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
-        respostas: ["Oi padrão npc 4","Resposta NPC 4 para Pergunta 1", "Resposta NPC 4 para Pergunta 2", "Resposta NPC 4 para Pergunta 3"]
+        opcoes: [
+            "Você tem dificuldade em identificar mesmo músicas que já ouviu?", 
+            "Você apresenta dificuldades em manter um diálogo? Por exemplo, as vezes as pessoas não conseguem compreender o que você diz", 
+            "Você tem apresentado alguma dificuldade em manter a fala constante?"],
+        respostas: [
+            "Doutor, eu amo música, mas ultimamente, muitas melodias estranhas, como se fossem apenas barulhos sem sentido.",
+            "Sim, até músicas que eu conheço bem parecem diferentes. É como se eu não reconhecesse os sons", 
+            "Na verdade, é até o contrário, às vezes tenho que pedir que meus amigos escrevam para que eu possa entender", 
+            "Não. Consigo me expressar normalmente em um diálogo sem perder o ritmo de fala, mas às vezes não consigo entender o que falam."]
     }
 }
 
 const alternativasDiagnostico = {
     npc1: {
-        alternativas: ["Agnosia Visual", "Agnosia Espacial", "Agnosia Auditiva"],
-        correta: 0,
+        alternativas: ["Agnosia visual para objetos", "Agnosia topográfica", "Prosopagnosia"],
+        correta: 1,
         explicacao: {
             correta: "Agnosia Visual é a incapacidade de reconhecer objetos visualmente, como descrito pelo paciente.",
-            errada: "Essa resposta está incorreta. Baseado nas respostas do paciente, a dificuldade parece estar relacionada ao reconhecimento visual."
+            errada: "A dificuldade dele esta relacionada aos locais, se tratando de um caso de agnosia topografica."
         }
     },
     npc2: {
-        alternativas: ["Agnosia Visual", "Agnosia Espacial", "Prosopagnosia"],
+        alternativas: ["Agnosia visual para objetos", "Agnosia topográfica", "Prosopagnosia"],
         correta: 2,
         explicacao: {
-            correta: "Prosopagnosia é a dificuldade em reconhecer rostos, uma característica descrita pelo paciente.",
-            errada: "A resposta correta está ligada à dificuldade em reconhecer rostos. Considere as respostas dadas pelo NPC."
+            correta: "A prosopagnosia é a agnosia visual especifica para rostos, assim como ele diz",
+            errada: "Por mais que elas sejam visuais, a agnosia que o paciente reclama tem um alvo em especifico"
         }
     },
     npc3: {
-        alternativas: ["Agnosia Auditiva", "Agnosia Visual", "Simultagnosia"],
-        correta: 1,
+        alternativas: ["Agnosia visual associativa para objetos", "Agnosia visual aperceptiva para objetos", "Prosopagnosia"],
+        correta: 0,
         explicacao: {
-            correta: "Agnosia Visual indica dificuldades na identificação de objetos visuais, o que o paciente descreveu.",
-            errada: "Agnosia Visual é a dificuldade predominante com objetos visuais, conforme sugerido pelas respostas do NPC."
+            correta: "O paciente sofre de dificuldade de fazer a associação do objeto com o seu significado",
+            errada: "A dificuldade dele está em interpretar os significados e não a forma"
         }
     },
     npc4: {
-        alternativas: ["Agnosia Táctil", "Simultagnosia", "Agnosia Auditiva"],
+        alternativas: ["Agnosia auditiva", "Afasia de Wernicke", "Afasia de Broca "],
         correta: 1,
         explicacao: {
-            correta: "Simultagnosia é a incapacidade de perceber múltiplos elementos ao mesmo tempo, relevante para o caso.",
-            errada: "Simultagnosia parece ser a condição que corresponde às dificuldades mencionadas pelo paciente."
+            correta: "Agnosia auditiva é a incapacidade de interpretar sons, assim como o paciente diz",
+            errada: "As afasias afetam a capacidade do paciente de se comunicar, mas ela consegue falar normalmente"
         }
     }
 };
