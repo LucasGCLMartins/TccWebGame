@@ -59,16 +59,32 @@ npc4Image.src = './img/npc4.png'
 let dialogoAtivo = false
 let npcAtual = null
 let opcaoSelecionada = null
+let resposta = null
+let controla_alerta = false
 
 
 const dialogos = {
     npc1: {
-        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
-        respostas: ["Oi padrão npc 1","Resposta NPC 1 para Pergunta 1", "Resposta NPC 1 para Pergunta 2", "Resposta NPC 1 para Pergunta 3"]
+        opcoes: [
+            "Essas dificuldades acontecem apenas no trabalho ou em outros lugares também?", 
+            "Você diria que tem dificuldade para entender as formas dos objetos?", 
+            "Você tem problema para reconhecer objetos que usa com frequência?"],
+        respostas: [
+            "Estou ficando preocupado, doutor. Às vezes, no trabalho, olho para uma caneta ou uma folha e tenho que pensar um pouco para lembrar o que é.",
+            "Não é só no trabalho. Até em casa, às vezes, olho para um utensílio e demoro para perceber o que é.", 
+            "Não, eu vejo a forma, mas preciso de um tempo para lembrar o nome e para que serve", 
+            "Sim. É como se eu tivesse que redescobrir o que estou vendo."]
     },
     npc2: {
-        opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
-        respostas: ["Oi padrão npc 2","Resposta NPC 2 para Pergunta 1", "Resposta NPC 2 para Pergunta 2", "Resposta NPC 2 para Pergunta 3"]
+        opcoes: [
+            "Pergunta 1", 
+            "Pergunta 2", 
+            "Pergunta 3"],
+        respostas: [
+            "Oi padrão npc 2",
+            "Resposta NPC 2 para Pergunta 1", 
+            "Resposta NPC 2 para Pergunta 2", 
+            "Resposta NPC 2 para Pergunta 3"]
     },
     npc3: {
         opcoes: ["Pergunta 1", "Pergunta 2", "Pergunta 3"],
@@ -80,23 +96,116 @@ const dialogos = {
     }
 }
 
-function desenharOpcoesDeDialogo(npc) {
-    const padding = 10
-    const maxWidth = 300
-    const fontSize = 18
-    const opcoes = dialogos[npc].opcoes
-    const dialogoX = 50
-    const dialogoY = 450
+const alternativasDiagnostico = {
+    npc1: {
+        alternativas: ["Agnosia Visual", "Agnosia Espacial", "Agnosia Auditiva"],
+        correta: 0,
+        explicacao: {
+            correta: "Agnosia Visual é a incapacidade de reconhecer objetos visualmente, como descrito pelo paciente.",
+            errada: "Essa resposta está incorreta. Baseado nas respostas do paciente, a dificuldade parece estar relacionada ao reconhecimento visual."
+        }
+    },
+    npc2: {
+        alternativas: ["Agnosia Visual", "Agnosia Espacial", "Prosopagnosia"],
+        correta: 2,
+        explicacao: {
+            correta: "Prosopagnosia é a dificuldade em reconhecer rostos, uma característica descrita pelo paciente.",
+            errada: "A resposta correta está ligada à dificuldade em reconhecer rostos. Considere as respostas dadas pelo NPC."
+        }
+    },
+    npc3: {
+        alternativas: ["Agnosia Auditiva", "Agnosia Visual", "Simultagnosia"],
+        correta: 1,
+        explicacao: {
+            correta: "Agnosia Visual indica dificuldades na identificação de objetos visuais, o que o paciente descreveu.",
+            errada: "Agnosia Visual é a dificuldade predominante com objetos visuais, conforme sugerido pelas respostas do NPC."
+        }
+    },
+    npc4: {
+        alternativas: ["Agnosia Táctil", "Simultagnosia", "Agnosia Auditiva"],
+        correta: 1,
+        explicacao: {
+            correta: "Simultagnosia é a incapacidade de perceber múltiplos elementos ao mesmo tempo, relevante para o caso.",
+            errada: "Simultagnosia parece ser a condição que corresponde às dificuldades mencionadas pelo paciente."
+        }
+    }
+};
 
-    c.fillStyle = 'black'
-    c.fillRect(dialogoX, dialogoY, maxWidth, 100 + (fontSize + padding) * opcoes.length)
+let perguntasFeitas = 0;
 
-    c.font = `${fontSize}px Arial`
-    c.fillStyle = 'white'
-    opcoes.forEach((opcao, index) => {
-        c.fillText(`${index + 1}. ${opcao}`, dialogoX + padding, dialogoY + padding + (index * (fontSize + padding)))
-    })
+function exibirJanelaAlternativas(npc) {
+    const alternativas = alternativasDiagnostico[npc].alternativas;
+    const posX = 100;
+    const posY = 200;
+    const larguraCaixa = 400;
+    const alturaCaixa = 200;
+    const padding = 10;
+    const fontSize = 18;
+
+    // Desenhar janela de alternativas
+    c.fillStyle = 'black';
+    c.fillRect(posX, posY, larguraCaixa, alturaCaixa);
+    c.fillStyle = 'white';
+    c.font = `${fontSize}px Arial`;
+
+    alternativas.forEach((alt, index) => {
+        c.fillText(`${index + 1}. ${alt}`, posX + padding, posY + padding + (index * (fontSize + padding) + fontSize));
+    });
+
+    c.fillText("Escolha a alternativa correta (1, 2 ou 3)", posX + padding, posY + alturaCaixa - padding);
 }
+
+function verificarResposta(npc, escolha) {
+    const alternativaCorreta = alternativasDiagnostico[npc].correta;
+    const explicacao = alternativasDiagnostico[npc].explicacao;
+    if (controla_alerta){
+        if (escolha === alternativaCorreta + 1) {
+            alert("Correto! " + explicacao.correta);
+            controla_alerta = false
+        } else {
+            alert("Incorreto. " + explicacao.errada);
+            controla_alerta = false
+            return
+        }        
+    }
+
+}
+
+function desenharOpcoesDeDialogo(npc) {
+    const padding = 10;
+    const fontSize = 18;
+    const opcoes = dialogos[npc].opcoes;
+    const dialogoX = 50;
+    const dialogoY = 450;
+
+    // Calcular a largura e altura necessárias para as opções de diálogo
+    let larguraMaxima = [];
+    opcoes.forEach((opcao) => {
+        const larguraMax = c.measureText(opcao).width;
+        larguraMaxima.push(larguraMax)
+    });
+    maxlen=Math.max(...larguraMaxima)
+    
+    // Definir largura e altura da caixa
+    const larguraCaixa = Math.min(maxlen)+ padding * 5 ;
+    
+    const alturaCaixa = padding * 2 + (fontSize + padding) * opcoes.length;
+
+
+
+    // Desenhar caixa de opções de diálogo com tamanho dinâmico
+    c.fillStyle = 'black';
+    c.fillRect(dialogoX, dialogoY, larguraCaixa, alturaCaixa);
+
+    // Desenhar as opções na caixa
+    c.font = `${fontSize}px Arial`;
+    c.fillStyle = 'white';
+    opcoes.forEach((opcao, index) => {
+        c.fillText(`${index + 1}. ${opcao}`, dialogoX + padding, dialogoY + padding + (index * (fontSize + padding) + fontSize));
+    });
+}
+
+
 
 
 function verificarProximidade(player, npc) {
@@ -111,6 +220,7 @@ function verificarProximidade(player, npc) {
 function iniciarDialogo(npc) {
     dialogoAtivo = true;
     npcAtual = npc;
+    perguntasFeitas = 0;
     desenharOpcoesDeDialogo(npc)
 }
 
@@ -121,36 +231,52 @@ function ocultarCaixaDeDialogo() {
 
 function desenharDialogo(npc, dialogo) {
     const padding = 10;
-    const maxWidth = 300; 
     const fontSize = 18;
+    const maxWidth = 300;
     
-    const dialogoX =  npc.position.x + npc.width + 10; 
-    const dialogoY = npc.position.y - npc.height / 2; 
+    const dialogoX = npc.position.x + npc.width + 10;
+    const dialogoY = npc.position.y - npc.height / 2;
 
-    c.fillStyle = 'black'; 
-    c.fillRect(dialogoX, dialogoY, maxWidth, 100);
-
-    c.font = `${fontSize}px Arial`;
-    c.fillStyle = 'white';
-
+    // Calcular a largura e altura necessárias para o texto
     const palavras = dialogo.split(' ');
     let linha = '';
-    let linhaY = dialogoY + padding + fontSize; 
+    let linhas = [];
+    let larguraMaxima = 0;
 
     palavras.forEach((palavra) => {
         const testeLinha = linha + palavra + ' ';
         const larguraTeste = c.measureText(testeLinha).width;
 
         if (larguraTeste > maxWidth - padding * 2) {
-            c.fillText(linha, dialogoX + padding, linhaY);
+            linhas.push(linha);
+            larguraMaxima = Math.max(larguraMaxima, c.measureText(linha).width);
             linha = palavra + ' ';
-            linhaY += fontSize; 
         } else {
             linha = testeLinha;
         }
     });
 
-    c.fillText(linha, dialogoX + padding, linhaY);
+    // Adicionar a última linha
+    linhas.push(linha);
+    larguraMaxima = Math.max(larguraMaxima, c.measureText(linha).width);
+
+    // Definir largura e altura da caixa
+    const larguraCaixa = Math.min(larguraMaxima + padding * 5, maxWidth);
+    const alturaCaixa = linhas.length * fontSize + padding * 3;
+
+    // Desenhar caixa de diálogo com tamanho dinâmico
+    c.fillStyle = 'black';
+    c.fillRect(dialogoX, dialogoY, larguraCaixa, alturaCaixa);
+
+    // Desenhar o texto na caixa
+    c.font = `${fontSize}px Arial`;
+    c.fillStyle = 'white';
+    let linhaY = dialogoY + padding + fontSize;
+
+    linhas.forEach((linha) => {
+        c.fillText(linha, dialogoX + padding, linhaY);
+        linhaY += fontSize;
+    });
 }
 
 
@@ -298,7 +424,25 @@ function animate (){
             default:
                 desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[0]); 
             break;
+        }
 
+        switch(resposta){
+            case "1":
+                verificarResposta(npcAtual, 1)
+            break
+            case "2":
+                verificarResposta(npcAtual, 2)
+            break
+            case "3":
+                verificarResposta(npcAtual, 3)
+            break
+            default:
+                break;
+        }
+
+
+        if (perguntasFeitas===3){
+            exibirJanelaAlternativas(npcAtual);
         }
 
         const npcObjeto = eval(npcAtual) 
@@ -361,46 +505,52 @@ function animate (){
 animate()
 
 window.addEventListener('keydown', (e) => {
-    if (dialogoAtivo) {
-        if (e.key === '1') {
+    if (dialogoAtivo && perguntasFeitas < 3) {
+        if (e.key === '1' ) {
+            perguntasFeitas+=1
             opcaoSelecionada = "1";
         } else if (e.key === '2') {
+            perguntasFeitas+=1
             opcaoSelecionada = "2";
         } else if (e.key === '3') {
+            perguntasFeitas+=1
             opcaoSelecionada = "3";
+        }
+    }else{
+        if (e.key === '1') {
+            controla_alerta = true
+            resposta = "1";
+        } else if (e.key === '2') {
+            controla_alerta = true
+            resposta = "2";
+        } else if (e.key === '3') {
+            controla_alerta = true
+            resposta = "3";
         }
     }
 })
 
 window.addEventListener('keydown', (e) => {
-    switch(e.key){
-        case 'w':
-            keys.w.pressed = true
-            break
-        case 'a':
-            keys.a.pressed = true
-            break
-        case 's':
-            keys.s.pressed = true
-            break
-        case 'd':
-            keys.d.pressed = true
-            break
+    if (e.key === 'w' || e.key==='ArrowUp') {
+        keys.w.pressed = true;
+    } else if (e.key === 'a'|| e.key==='ArrowLeft') {
+        keys.a.pressed = true;
+    } else if (e.key === 's'|| e.key==='ArrowDown') {
+        keys.s.pressed = true;
+    } else if (e.key === 'd'|| e.key==='ArrowRight') {
+        keys.d.pressed = true;
     }
-})
+});
+
 window.addEventListener('keyup', (e) => {
-    switch(e.key){
-        case 'w':
-            keys.w.pressed = false
-            break
-        case 'a':
-            keys.a.pressed = false
-            break
-        case 's':
-            keys.s.pressed = false
-            break
-        case 'd':
-            keys.d.pressed = false
-            break
+    if (e.key === 'w' || e.key==='ArrowUp') {
+        keys.w.pressed = false;
+    } else if (e.key === 'a'|| e.key==='ArrowLeft') {
+        keys.a.pressed = false;
+    } else if (e.key === 's'|| e.key==='ArrowDown') {
+        keys.s.pressed = false;
+    } else if (e.key === 'd'|| e.key==='ArrowRight') {
+        keys.d.pressed = false;
     }
-})
+});
+
