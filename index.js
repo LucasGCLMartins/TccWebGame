@@ -155,16 +155,67 @@ function exibirJanelaAlternativas(npc) {
     c.fillText("Escolha a alternativa correta (1, 2 ou 3)", posX + padding, posY + alturaCaixa - padding);
 }
 
+function exibeResultResposta(dialogo) {
+
+    const dialogoX = 50;
+    const dialogoY = 450;
+    const padding = 10;
+    const fontSize = 18;
+    const maxWidth = 300;
+
+    const palavras = dialogo.split(' ');
+    let linha = '';
+    let linhas = [];
+    let larguraMaxima = 0;
+
+    palavras.forEach((palavra) => {
+        const testeLinha = linha + palavra + ' ';
+        const larguraTeste = c.measureText(testeLinha).width;
+
+        if (larguraTeste > maxWidth - padding * 2) {
+            linhas.push(linha);
+            larguraMaxima = Math.max(larguraMaxima, c.measureText(linha).width);
+            linha = palavra + ' ';
+        } else {
+            linha = testeLinha;
+        }
+    });
+
+    // Adicionar a última linha
+    linhas.push(linha);
+    larguraMaxima = Math.max(larguraMaxima, c.measureText(linha).width);
+
+    // Definir largura e altura da caixa
+    const larguraCaixa = Math.min(larguraMaxima + padding * 5, maxWidth);
+    const alturaCaixa = linhas.length * fontSize + padding * 3;
+
+    // Desenhar caixa de diálogo com tamanho dinâmico
+    c.fillStyle = 'black';
+    c.fillRect(dialogoX, dialogoY, larguraCaixa, alturaCaixa);
+
+    // Desenhar o texto na caixa
+    c.font = `${fontSize}px Arial`;
+    c.fillStyle = 'white';
+    let linhaY = dialogoY + padding + fontSize;
+
+    linhas.forEach((linha) => {
+        c.fillText(linha, dialogoX + padding, linhaY);
+        linhaY += fontSize;
+    });
+}
+
+
+
 function verificarResposta(npc, escolha) {
     const alternativaCorreta = alternativasDiagnostico[npc].correta;
     const explicacao = alternativasDiagnostico[npc].explicacao;
     if (controla_alerta){
         if (escolha === alternativaCorreta + 1) {
-            alert("Correto! " + explicacao.correta);
-            controla_alerta = false
+            exibeResultResposta("Correto! " + explicacao.correta)
+            //controla_alerta = false
         } else {
-            alert("Incorreto. " + explicacao.errada);
-            controla_alerta = false
+            exibeResultResposta("Incorreto. " + explicacao.errada);
+            //controla_alerta = false
             return
         }        
     }
@@ -409,46 +460,47 @@ function animate (){
         else if (verificarProximidade(player, npc4)) iniciarDialogo('npc4');
     } else {
 
-        desenharOpcoesDeDialogo(npcAtual);
+        if(perguntasFeitas<3){
+            desenharOpcoesDeDialogo(npcAtual);
 
-        switch(opcaoSelecionada){
-            case "1":
-                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[1]); 
-            break
-            case "2":
-                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[2]); 
-            break
-            case "3":
-                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[3]); 
-            break
-            default:
-                desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[0]); 
-            break;
-        }
-
-        switch(resposta){
-            case "1":
-                verificarResposta(npcAtual, 1)
-            break
-            case "2":
-                verificarResposta(npcAtual, 2)
-            break
-            case "3":
-                verificarResposta(npcAtual, 3)
-            break
-            default:
+            switch(opcaoSelecionada){
+                case "1":
+                    desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[1]); 
+                break
+                case "2":
+                    desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[2]); 
+                break
+                case "3":
+                    desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[3]); 
+                break
+                default:
+                    desenharDialogo(eval(npcAtual), dialogos[npcAtual].respostas[0]); 
                 break;
+            }
+       
         }
-
-
         if (perguntasFeitas===3){
             exibirJanelaAlternativas(npcAtual);
+            switch(resposta){
+                case "1":
+                    verificarResposta(npcAtual, 1)
+                break
+                case "2":
+                    verificarResposta(npcAtual, 2)
+                break
+                case "3":
+                    verificarResposta(npcAtual, 3)
+                break
+                default:
+                    break;
+            }     
         }
 
         const npcObjeto = eval(npcAtual) 
         if (!verificarProximidade(player, npcObjeto)) {
             ocultarCaixaDeDialogo() 
             opcaoSelecionada = null
+            resposta = null
         }
         
     }
