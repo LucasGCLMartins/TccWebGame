@@ -137,7 +137,7 @@ const alternativasDiagnostico = {
     },
     npc4: {
         alternativas: ["Agnosia auditiva", "Afasia de Wernicke", "Afasia de Broca "],
-        correta: 1,
+        correta: 0,
         explicacao: {
             correta: "Agnosia auditiva é a incapacidade de interpretar sons, assim como o paciente diz",
             errada: "As afasias afetam a capacidade do paciente de se comunicar, mas ela consegue falar normalmente"
