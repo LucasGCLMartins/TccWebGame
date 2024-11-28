@@ -64,6 +64,28 @@ let controla_alerta = false
 
 
 const dialogos = {
+    npc1: {
+        opcoes: [
+            "Você tem dificuldade em enxergar toda a cena ao seu redor?", 
+            "Você consegue identificar objetos específicos sem problemas?", 
+            "Sua dificuldade é perceber onde os objetos estão em relação uns aos outros?"],
+        respostas: [
+            "Doutor, percebo que não consigo mais ver as coisas como um todo. Vejo os objetos, mas é como se eles estivessem flutuando, separados do restante.",
+            "Sim, eu vejo tudo separado. Preciso focar em cada detalhe e, quando faço isso, perco o resto da cena.", 
+            "Sim, consigo ver cada objeto, mas não consigo juntá-los em uma cena completa.", 
+            "Sim, às vezes, parece que os objetos estão soltos, sem uma organização."]
+    },
+    npc2: {
+        opcoes: [
+            "Você consegue identificar objetos facilmente em uma cena?", 
+            "Você tem dificuldade em reconhecer várias coisas ao mesmo tempo?", 
+            "É mais difícil para você identificar objetos em situações caóticas?"],
+        respostas: [
+            "Doutor, eu percebo cada coisa isolada, mas quando há muita informação ao meu redor, tudo fica confuso.",
+            "Não, a cena em si consigo compreender mas para que eu possa ver os objetos tenho que focar.", 
+            "Isso. Quando tento focar em várias coisas, só consigo ver uma de cada vez.", 
+            "Isso mesmo, em situações caóticas parece que só consigo perceber um objeto por vez."]
+    },
     npc3: {
         opcoes: [
             "Essas dificuldades acontecem apenas no trabalho ou em outros lugares também?", 
@@ -75,72 +97,50 @@ const dialogos = {
             "Não, eu vejo a forma, mas preciso de um tempo para lembrar o nome e para que serve", 
             "Sim. É como se eu tivesse que redescobrir o que estou vendo."]
     },
-    npc2: {
-        opcoes: [
-            "Você consegue reconhecer as pessoas pela voz ou pelo jeito que elas andam?", 
-            "Você tem dificuldade em lembrar dos detalhes dos rostos das pessoas?", 
-            "Você consegue identificar outras coisas, como objetos ou lugares?"],
-        respostas: [
-            "É tão estranho, doutor. Eu olho para as pessoas que conheço, mas os rostos delas parecem borrões. Nem meus filhos eu reconheço mais.",
-            "Sim, a voz ajuda, assim como o jeito que andam, mas principalmente suas roupas.", 
-            "Exatamente. Os rostos parecem todos iguais. É como se tudo nele estivesse rabiscado.", 
-            "Ah, sim. Com objetos e lugares, eu ainda não tenho problema, só com os rostos mesmo"]
-    },
-    npc1: {
-        opcoes: [
-            "Você tem dificuldade em encontrar o caminho de volta para casa?", 
-            "Você consegue se lembrar do nome dos lugares que visita?", 
-            "Quando anda pela cidade, sente que está em um lugar desconhecido?"],
-        respostas: [
-            "Doutor, algo estranho está acontecendo comigo. Eu sempre conheci cada rua dessa cidade, mas recentemente, mesmo no bairro de casa, me perco constantemente.",
-            "Sim, doutor. Às vezes, mesmo estando a poucos metros de casa, eu fico confuso de onde ir", 
-            "Ah, sim, meu problema é que enquanto estou andando, eu me esqueço de onde estou, parece que as ruas se misturam", 
-            "Isso mesmo! Lugares que conheço bem às vezes parecem diferentes, como se eu estivesse em outra cidade."]
-    },
     npc4: {
         opcoes: [
-            "Você tem dificuldade em identificar mesmo músicas que já ouviu?", 
-            "Você apresenta dificuldades em manter um diálogo? Por exemplo, as vezes as pessoas não conseguem compreender o que você diz", 
-            "Você tem apresentado alguma dificuldade em manter a fala constante?"],
+            "Você consegue ver os detalhes dos objetos claramente em um ambiente bem iluminado?", 
+            "Você sente que os objetos se misturam com o fundo em algumas situações?”", 
+            "Esse problema ocorre com objetos específicos ou qualquer objeto em condições de pouca luz?"],
         respostas: [
-            "Doutor, eu amo música, mas ultimamente, muitas melodias estranhas, como se fossem apenas barulhos sem sentido.",
-            "Sim, até músicas que eu conheço bem parecem diferentes. É como se eu não reconhecesse os sons", 
-            "Na verdade, é até o contrário, às vezes tenho que pedir que meus amigos escrevam para que eu possa entender", 
-            "Não. Consigo me expressar normalmente em um diálogo sem perder o ritmo de fala, mas às vezes não consigo entender o que falam."]
+            "Doutor, não sei o que está acontecendo. Em ambientes escuros ou com pouca diferença entre o objeto e o fundo, tenho dificuldade em perceber o que estou olhando.",
+            "Sim, com luz forte, consigo ver bem melhor.", 
+            "Sim, parece que eles se camuflam, principalmente em cores e tons parecidos.", 
+            "Acontece com qualquer objeto quando o contraste não é muito forte."]
     }
 }
 
 const alternativasDiagnostico = {
     npc1: {
-        alternativas: ["Agnosia visual para objetos", "Agnosia topográfica", "Prosopagnosia"],
-        correta: 1,
+        alternativas: ["Simultanagnosia dorsal", "Simultanagnosia ventral ", "Agnosia aperceptiva visual para objetos "],
+        correta: 0,
         explicacao: {
-            correta: "Agnosia Visual é a incapacidade de reconhecer objetos visualmente, como descrito pelo paciente.",
-            errada: "A dificuldade dele esta relacionada aos locais, se tratando de um caso de agnosia topografica."
+            correta: "O paciente descreveu dificuldade em enxergar a cena como um todo e percebe os objetos de forma isolada, características clássicas da simultanagnosia dorsal. ",
+            errada: "O paciente relatou que vê objetos específicos, mas não consegue integrá-los em uma cena completa. Isso descarta simultanagnosia ventral, que afeta o reconhecimento dos objetos, e agnosia aperceptiva, que prejudica a percepção de formas."
         }
     },
     npc2: {
-        alternativas: ["Agnosia visual para objetos", "Agnosia topográfica", "Prosopagnosia"],
+        alternativas: ["Agnosia associativa visual para objetos", "Simultanagnosia dorsal ", "Simultanagnosia ventral"],
         correta: 2,
         explicacao: {
-            correta: "A prosopagnosia é a agnosia visual especifica para rostos, assim como ele diz",
-            errada: "Por mais que elas sejam visuais, a agnosia que o paciente reclama tem um alvo em especifico"
+            correta: "O paciente relatou dificuldade em reconhecer vários objetos ao mesmo tempo, especialmente em situações caóticas, mas consegue compreender a cena geral. Isso é típico de simultanagnosia ventral.",
+            errada: "O paciente mencionou que percebe a cena geral, mas tem dificuldade em reconhecer vários objetos simultaneamente, focando em apenas um por vez. Isso descarta simultanagnosia dorsal, que afeta a percepção da cena completa, e agnosia associativa, que dificulta associar objetos ao significado."
         }
     },
     npc3: {
-        alternativas: ["Agnosia visual associativa para objetos", "Agnosia visual aperceptiva para objetos", "Prosopagnosia"],
+        alternativas: ["Agnosia associativa visual para objetos", "Agnosia aperceptiva visual para objetos", "Prosopagnosia"],
         correta: 0,
         explicacao: {
-            correta: "O paciente sofre de dificuldade de fazer a associação do objeto com o seu significado",
-            errada: "A dificuldade dele está em interpretar os significados e não a forma"
+            correta: "O paciente consegue ver as formas, mas demora para identificar ou lembrar o propósito dos objetos. Isso é típico de agnosia associativa visual para objetos.",
+            errada: " paciente consegue ver as formas dos objetos, mas demora para identificar ou lembrar o propósito. Isso descarta agnosia aperceptiva, que envolve dificuldade em perceber formas, e prosopagnosia, que é relacionada a reconhecer rostos."
         }
     },
     npc4: {
-        alternativas: ["Agnosia auditiva", "Afasia de Wernicke", "Afasia de Broca "],
-        correta: 0,
+        alternativas: ["Agnosia associativa visual para objetos", "Agnosia aperceptiva visual para objetos", "Simultanagnosia dorsal "],
+        correta: 1,
         explicacao: {
-            correta: "Agnosia auditiva é a incapacidade de interpretar sons, assim como o paciente diz",
-            errada: "As afasias afetam a capacidade do paciente de se comunicar, mas ela consegue falar normalmente"
+            correta: "O paciente descreveu dificuldade em perceber objetos em ambientes com baixo contraste ou pouca luz, características típicas de agnosia aperceptiva visual para objetos, que afeta a capacidade de reconhecer formas básicas.",
+            errada: "O paciente relatou dificuldade em distinguir objetos do fundo, especialmente em condições de baixo contraste ou iluminação. Isso descarta agnosia associativa, que afeta o reconhecimento do significado dos objetos, e simultanagnosia dorsal, que envolve problemas em perceber a cena completa."
         }
     }
 };
@@ -175,7 +175,7 @@ function exibeResultResposta(dialogo) {
     const dialogoY = 450;
     const padding = 10;
     const fontSize = 18;
-    const maxWidth = 300;
+    const maxWidth = 600;
 
     const palavras = dialogo.split(' ');
     let linha = '';
